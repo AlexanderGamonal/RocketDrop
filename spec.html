@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RocketDrop — Especificación Técnica</title>
+  <style>
+    :root {
+      --primary: #2563EB;
+      --primary-dark: #1D4ED8;
+      --primary-light: #EFF6FF;
+      --accent: #7C3AED;
+      --success: #059669;
+      --error: #DC2626;
+      --warning: #D97706;
+      --bg: #0F172A;
+      --surface: #1E293B;
+      --surface2: #273549;
+      --border: #334155;
+      --text: #F1F5F9;
+      --muted: #94A3B8;
+      --code-bg: #0D1117;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 50%, #0F172A 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 72px 24px 56px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(37,99,235,0.18) 0%, transparent 70%);
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(37,99,235,0.15);
+      border: 1px solid rgba(37,99,235,0.35);
+      color: #93C5FD;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 99px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .hero h1 {
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #fff 30%, #93C5FD 70%, #C4B5FD 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+    }
+    .hero p {
+      color: var(--muted);
+      font-size: 1.1rem;
+      margin-top: 12px;
+      position: relative;
+    }
+    .hero-meta {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+      position: relative;
+    }
+    .hero-meta span {
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pill {
+      background: rgba(124,58,237,0.15);
+      border: 1px solid rgba(124,58,237,0.3);
+      color: #C4B5FD;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 99px;
+    }
+
+    /* ── Layout ── */
+    .layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      max-width: 1280px;
+      margin: 0 auto;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      border-right: 1px solid var(--border);
+      padding: 32px 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .sidebar-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0 24px 8px;
+    }
+    .sidebar nav a {
+      display: block;
+      padding: 7px 24px;
+      font-size: 13.5px;
+      color: var(--muted);
+      text-decoration: none;
+      border-left: 2px solid transparent;
+      transition: all .15s;
+    }
+    .sidebar nav a:hover {
+      color: var(--text);
+      border-left-color: var(--primary);
+      background: rgba(37,99,235,0.06);
+    }
+    .sidebar nav a.active {
+      color: #93C5FD;
+      border-left-color: var(--primary);
+      background: rgba(37,99,235,0.1);
+    }
+
+    /* ── Content ── */
+    .content {
+      padding: 56px 64px;
+      max-width: 900px;
+    }
+
+    section {
+      margin-bottom: 72px;
+      scroll-margin-top: 24px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-num {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #CBD5E1;
+      margin: 28px 0 12px;
+    }
+    p { color: #CBD5E1; margin-bottom: 12px; }
+
+    /* ── Tables ── */
+    .table-wrap { overflow-x: auto; margin: 16px 0; border-radius: 10px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead tr { background: var(--surface2); }
+    th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 11px 16px;
+      border-bottom: 1px solid rgba(51,65,85,0.5);
+      color: #CBD5E1;
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(37,99,235,0.04); }
+    td code, th code { font-family: 'Fira Code', 'Cascadia Code', monospace; font-size: 12px; }
+
+    /* ── Code blocks ── */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      overflow-x: auto;
+      font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+      font-size: 13px;
+      line-height: 1.65;
+      color: #E2E8F0;
+      margin: 16px 0;
+    }
+    code {
+      font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+      font-size: 13px;
+      background: rgba(51,65,85,0.6);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #93C5FD;
+    }
+    pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+
+    /* ── Callouts ── */
+    .callout {
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 20px 0;
+      font-size: 14px;
+      display: flex;
+      gap: 12px;
+    }
+    .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .callout.info { background: rgba(37,99,235,0.1); border: 1px solid rgba(37,99,235,0.25); color: #93C5FD; }
+    .callout.warning { background: rgba(217,119,6,0.1); border: 1px solid rgba(217,119,6,0.3); color: #FCD34D; }
+    .callout.danger { background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.25); color: #FCA5A5; }
+
+    /* ── Diagram ── */
+    .diagram {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      overflow-x: auto;
+      font-family: 'Fira Code', monospace;
+      font-size: 12.5px;
+      line-height: 1.7;
+      color: #94A3B8;
+      margin: 16px 0;
+    }
+    .diagram .highlight { color: #93C5FD; }
+    .diagram .arrow { color: #7C3AED; }
+    .diagram .label { color: #6EE7B7; }
+
+    /* ── Feature cards ── */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      transition: border-color .2s;
+    }
+    .card:hover { border-color: rgba(37,99,235,0.5); }
+    .card-icon { font-size: 24px; margin-bottom: 10px; }
+    .card h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .card p { font-size: 13px; color: var(--muted); margin: 0; }
+
+    /* ── Endpoint blocks ── */
+    .endpoint {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+    .endpoint-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+    }
+    .method {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 6px;
+      letter-spacing: .05em;
+    }
+    .method.post { background: rgba(5,150,105,0.2); color: #6EE7B7; border: 1px solid rgba(5,150,105,0.3); }
+    .method.delete { background: rgba(220,38,38,0.15); color: #FCA5A5; border: 1px solid rgba(220,38,38,0.25); }
+    .endpoint-path { font-family: monospace; font-size: 14px; color: #E2E8F0; font-weight: 600; }
+    .endpoint-body { padding: 16px 20px; }
+    .endpoint-body p { font-size: 14px; color: var(--muted); margin-bottom: 12px; }
+
+    /* ── Badge / tag ── */
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin: 2px;
+    }
+    .tag-blue { background: rgba(37,99,235,0.15); color: #93C5FD; border: 1px solid rgba(37,99,235,0.3); }
+    .tag-purple { background: rgba(124,58,237,0.15); color: #C4B5FD; border: 1px solid rgba(124,58,237,0.3); }
+    .tag-green { background: rgba(5,150,105,0.15); color: #6EE7B7; border: 1px solid rgba(5,150,105,0.3); }
+
+    /* ── Token grid (design system) ── */
+    .token-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin: 16px 0; }
+    .token-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .token-swatch { height: 44px; }
+    .token-info { padding: 10px 12px; }
+    .token-name { font-family: monospace; font-size: 12px; color: var(--muted); }
+    .token-value { font-size: 13px; font-weight: 600; }
+
+    /* ── Checklist ── */
+    .checklist { list-style: none; margin: 12px 0; }
+    .checklist li {
+      padding: 6px 0;
+      font-size: 14px;
+      color: #CBD5E1;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .checklist li::before { content: '☐'; color: var(--muted); flex-shrink: 0; margin-top: 1px; }
+    .checklist li.done::before { content: '✓'; color: var(--success); }
+
+    /* ── Flow steps ── */
+    .flow { margin: 16px 0; }
+    .flow-step {
+      display: flex;
+      gap: 16px;
+      padding: 12px 0;
+      position: relative;
+    }
+    .flow-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 44px;
+      bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+    .step-num {
+      width: 32px;
+      height: 32px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary);
+      flex-shrink: 0;
+      z-index: 1;
+    }
+    .step-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .step-content p { font-size: 13px; color: var(--muted); margin: 0; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .content { padding: 32px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════ HERO ════════════ -->
+<div class="hero">
+  <div class="hero-badge">🚀 Especificación Técnica</div>
+  <h1>RocketDrop</h1>
+  <p>Carga de archivos de gran tamaño a Cloudflare R2 vía Multipart Upload</p>
+  <div class="hero-meta">
+    <span><span class="pill">v1.0.0</span></span>
+    <span>⚛️ React 18 + TypeScript</span>
+    <span>🟢 Node.js + Express</span>
+    <span>☁️ Cloudflare R2</span>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- ════════════ SIDEBAR ════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-title">Contenido</div>
+    <nav>
+      <a href="#overview">1. Visión general</a>
+      <a href="#architecture">2. Arquitectura</a>
+      <a href="#features">3. Funcionalidades</a>
+      <a href="#stack">4. Stack tecnológico</a>
+      <a href="#structure">5. Estructura del proyecto</a>
+      <a href="#env">6. Entorno y configuración</a>
+      <a href="#api">7. API Backend</a>
+      <a href="#components">8. Componentes</a>
+      <a href="#state">9. Estado y lógica de carga</a>
+      <a href="#utils">10. Utilidades</a>
+      <a href="#types">11. Tipos de datos</a>
+      <a href="#design">12. Sistema de diseño</a>
+      <a href="#flow">13. Flujo de carga E2E</a>
+      <a href="#errors">14. Manejo de errores</a>
+      <a href="#security">15. Modelo de seguridad</a>
+      <a href="#build">16. Build y despliegue</a>
+      <a href="#limits">17. Límites y restricciones</a>
+      <a href="#improvements">18. Mejoras propuestas</a>
+    </nav>
+  </aside>
+
+  <!-- ════════════ CONTENT ════════════ -->
+  <main class="content">
+
+    <!-- 1. Visión general -->
+    <section id="overview">
+      <div class="section-header">
+        <div class="section-num">1</div>
+        <h2>Visión general</h2>
+      </div>
+      <p><strong>RocketDrop</strong> es una aplicación web de página única (SPA) que permite subir archivos de hasta <strong>25 GB</strong> directamente a <strong>Cloudflare R2</strong> mediante la API de Multipart Upload compatible con S3.</p>
+      <p>El navegador divide el archivo en fragmentos de 100 MB y los sube concurrentemente (hasta 4 al mismo tiempo), evitando las limitaciones de memoria y tiempo de espera de una carga tradicional de una sola solicitud.</p>
+      <p>El servidor Express <strong>nunca recibe los bytes del archivo</strong>: solo orquesta URLs prefirmadas. Los datos van directamente del navegador a R2, manteniendo el servidor ligero y la transferencia rápida.</p>
+
+      <h3>Recorrido del usuario</h3>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>Soltar o seleccionar archivo</h4>
+            <p>Zona de arrastrar y soltar con validación de tamaño (≤ 25 GB)</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>Barra de progreso en tiempo real</h4>
+            <p>Porcentaje, velocidad de subida, tiempo estimado y contador de partes</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h4>URL pública lista</h4>
+            <p>Copiar al portapapeles o abrir directamente el archivo subido</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Arquitectura -->
+    <section id="architecture">
+      <div class="section-header">
+        <div class="section-num">2</div>
+        <h2>Arquitectura</h2>
+      </div>
+      <div class="diagram">
+<span class="highlight">┌─────────────────────────────────────────────────┐</span>
+<span class="highlight">│           Navegador (React SPA)                  │</span>
+│                                                  │
+│  DropZone → useUpload → UploadPanel → ResultPanel│
+│                  │                               │
+│            <span class="label">api.ts (fetch JSON)</span>               │
+<span class="highlight">└──────────────────┬──────────────────────────────┘</span>
+                   │ <span class="label">/api/*  (solo metadata, sin datos de archivo)</span>
+<span class="highlight">┌──────────────────▼──────────────────────────────┐</span>
+<span class="highlight">│          Servidor Express (server.js)             │</span>
+│                                                  │
+│  POST   /api/upload/init      <span class="arrow">→</span> CreateMultipart  │
+│  POST   /api/upload/part-url  <span class="arrow">→</span> Presign URL      │
+│  POST   /api/upload/complete  <span class="arrow">→</span> CompleteUpload   │
+│  DELETE /api/upload/abort     <span class="arrow">→</span> AbortUpload      │
+<span class="highlight">└──────────────────┬──────────────────────────────┘</span>
+                   │ <span class="label">AWS SDK v3 (compatible S3)</span>
+<span class="highlight">┌──────────────────▼──────────────────────────────┐</span>
+<span class="highlight">│         Cloudflare R2 (almacenamiento S3)         │</span>
+│                                                  │
+│  Bucket: <span class="label">${R2_BUCKET_NAME}</span>                        │
+│  Clave:  <span class="label">uploads/{uuid}-{nombre-archivo}</span>         │
+│  URL:    <span class="label">${R2_PUBLIC_URL}/{clave}</span>                 │
+<span class="highlight">└─────────────────────────────────────────────────┘</span>
+      </div>
+
+      <h3>Flujo de datos</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Etapa</th><th>Emisor</th><th>Destino</th><th>Contenido</th></tr></thead>
+          <tbody>
+            <tr><td>Iniciar carga</td><td>Navegador</td><td>Express</td><td>JSON con metadata</td></tr>
+            <tr><td>Obtener URL prefirmada</td><td>Navegador</td><td>Express</td><td>JSON con metadata</td></tr>
+            <tr><td>Subir fragmento</td><td>Navegador</td><td>R2 directamente</td><td>PUT binario</td></tr>
+            <tr><td>Completar carga</td><td>Navegador</td><td>Express</td><td>Lista de ETags</td></tr>
+            <tr><td>Abortar carga</td><td>Navegador</td><td>Express</td><td>key + uploadId</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 3. Funcionalidades -->
+    <section id="features">
+      <div class="section-header">
+        <div class="section-num">3</div>
+        <h2>Funcionalidades</h2>
+      </div>
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon">📤</div>
+          <h4>Multipart Upload</h4>
+          <p>Fragmentos de 100 MB con 4 subidas concurrentes</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🖱️</div>
+          <h4>Drag & Drop</h4>
+          <p>Interfaz visual con resaltado al arrastrar archivos</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">📊</div>
+          <h4>Progreso en tiempo real</h4>
+          <p>%, velocidad, ETA y contador de partes</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔁</div>
+          <h4>Reintentos automáticos</h4>
+          <p>3 intentos con backoff exponencial por fragmento</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">❌</div>
+          <h4>Cancelación</h4>
+          <p>Aborta todos los XHR activos y limpia en R2</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">📋</div>
+          <h4>Copiar URL</h4>
+          <p>Clipboard API con fallback a execCommand</p>
+        </div>
+      </div>
+
+      <h3>Métricas de progreso</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Métrica</th><th>Cálculo</th></tr></thead>
+          <tbody>
+            <tr><td>Porcentaje</td><td><code>sum(bytesSubidosPorParte) / tamañoArchivo × 100</code></td></tr>
+            <tr><td>Velocidad</td><td>Media móvil exponencial α=0.3 sobre delta por intervalo</td></tr>
+            <tr><td>ETA</td><td><code>bytesRestantes / velocidadActual</code></td></tr>
+            <tr><td>Partes</td><td>Contador de partes completadas vs. totales</td></tr>
+            <tr><td>Render</td><td>requestAnimationFrame (~25 fps) para evitar repintados excesivos</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 4. Stack -->
+    <section id="stack">
+      <div class="section-header">
+        <div class="section-num">4</div>
+        <h2>Stack tecnológico</h2>
+      </div>
+      <h3>Frontend</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Librería / Herramienta</th><th>Versión</th><th>Rol</th></tr></thead>
+          <tbody>
+            <tr><td>React</td><td>^18.3.1</td><td>Renderizado de UI</td></tr>
+            <tr><td>TypeScript</td><td>^5.4.5</td><td>Tipado estático</td></tr>
+            <tr><td>Vite</td><td>^5.2.0</td><td>Servidor de desarrollo y bundler</td></tr>
+            <tr><td>@vitejs/plugin-react</td><td>^4.3.0</td><td>JSX fast-refresh</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Backend</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Librería / Herramienta</th><th>Versión</th><th>Rol</th></tr></thead>
+          <tbody>
+            <tr><td>Express</td><td>^4.19.2</td><td>Servidor HTTP y API</td></tr>
+            <tr><td>@aws-sdk/client-s3</td><td>^3.600.0</td><td>Llamadas a la API Multipart de R2</td></tr>
+            <tr><td>@aws-sdk/s3-request-presigner</td><td>^3.600.0</td><td>Generación de URLs prefirmadas</td></tr>
+            <tr><td>uuid</td><td>^9.0.1</td><td>Generación de claves únicas de objetos</td></tr>
+            <tr><td>dotenv</td><td>^16.4.5</td><td>Carga de variables de entorno</td></tr>
+            <tr><td>concurrently</td><td>^8.2.2</td><td>Ejecutar API + Vite en paralelo (dev)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Almacenamiento</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Servicio</th><th>Protocolo</th></tr></thead>
+          <tbody>
+            <tr><td>Cloudflare R2</td><td>Compatible con S3 (AWS SDK v3)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 5. Estructura -->
+    <section id="structure">
+      <div class="section-header">
+        <div class="section-num">5</div>
+        <h2>Estructura del proyecto</h2>
+      </div>
+      <pre>RocketDrop/
+├── index.html                   <span style="color:#64748B"># Shell HTML — monta React</span>
+├── package.json                 <span style="color:#64748B"># Scripts y dependencias</span>
+├── vite.config.ts               <span style="color:#64748B"># Vite + proxy /api → :3000</span>
+├── tsconfig.json                <span style="color:#64748B"># tsconfig raíz (referencias)</span>
+├── tsconfig.app.json            <span style="color:#64748B"># TS para frontend (ES2020, strict)</span>
+├── tsconfig.node.json           <span style="color:#64748B"># TS para herramientas Node/Vite</span>
+├── server.js                    <span style="color:#64748B"># Backend Express</span>
+├── .env.example                 <span style="color:#64748B"># Plantilla de variables de entorno</span>
+└── src/
+    ├── main.tsx                 <span style="color:#64748B"># Punto de entrada React</span>
+    ├── App.tsx                  <span style="color:#64748B"># Componente raíz (enrutador de fases)</span>
+    ├── App.css                  <span style="color:#64748B"># Estilos globales + tokens de diseño</span>
+    ├── api.ts                   <span style="color:#64748B"># Wrappers fetch para el API backend</span>
+    ├── types.ts                 <span style="color:#64748B"># Tipos TypeScript compartidos</span>
+    ├── components/
+    │   ├── DropZone.tsx         <span style="color:#64748B"># UI de arrastrar y soltar</span>
+    │   ├── UploadPanel.tsx      <span style="color:#64748B"># UI de progreso (subiendo / error)</span>
+    │   └── ResultPanel.tsx      <span style="color:#64748B"># UI de resultado (éxito / cancelado)</span>
+    ├── hooks/
+    │   └── useUpload.ts         <span style="color:#64748B"># Hook de orquestación de carga</span>
+    └── utils/
+        ├── uploader.ts          <span style="color:#64748B"># Semáforo, xhrPut, lógica de reintentos</span>
+        └── format.ts            <span style="color:#64748B"># fmtBytes, fmtTime</span></pre>
+    </section>
+
+    <!-- 6. Entorno -->
+    <section id="env">
+      <div class="section-header">
+        <div class="section-num">6</div>
+        <h2>Entorno y configuración</h2>
+      </div>
+      <h3>Variables de entorno (<code>.env</code>)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Variable</th><th>Requerida</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>R2_ACCOUNT_ID</code></td><td><span class="tag tag-green">Sí</span></td><td>ID de cuenta de Cloudflare</td></tr>
+            <tr><td><code>R2_ACCESS_KEY_ID</code></td><td><span class="tag tag-green">Sí</span></td><td>Token de API R2 — clave de acceso</td></tr>
+            <tr><td><code>R2_SECRET_ACCESS_KEY</code></td><td><span class="tag tag-green">Sí</span></td><td>Token de API R2 — secreto</td></tr>
+            <tr><td><code>R2_BUCKET_NAME</code></td><td><span class="tag tag-green">Sí</span></td><td>Nombre del bucket de destino</td></tr>
+            <tr><td><code>R2_PUBLIC_URL</code></td><td><span class="tag tag-green">Sí</span></td><td>URL pública base (ej. <code>https://pub-xxx.r2.dev</code>)</td></tr>
+            <tr><td><code>PORT</code></td><td><span class="tag tag-blue">No</span></td><td>Puerto del servidor (por defecto: <code>3000</code>)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Proxy Vite (solo desarrollo)</h3>
+      <pre>// vite.config.ts
+proxy: { '/api': 'http://localhost:3000' }</pre>
+      <p>En producción, Express sirve la carpeta <code>dist/</code> compilada y gestiona las rutas <code>/api/*</code> en el mismo puerto.</p>
+    </section>
+
+    <!-- 7. API Backend -->
+    <section id="api">
+      <div class="section-header">
+        <div class="section-num">7</div>
+        <h2>API Backend</h2>
+      </div>
+      <p>Todos los endpoints aceptan y devuelven <code>application/json</code>. El servidor <strong>nunca recibe bytes de archivo</strong>.</p>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <span class="endpoint-path">/api/upload/init</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Inicia una sesión de carga multiparte en R2.</p>
+          <strong style="font-size:13px;color:var(--muted);">REQUEST</strong>
+          <pre>{ "filename": "video.mp4", "contentType": "video/mp4" }</pre>
+          <strong style="font-size:13px;color:var(--muted);">RESPONSE</strong>
+          <pre>{ "uploadId": "abc123", "key": "uploads/uuid-video.mp4" }</pre>
+          <p>Llama a <code>CreateMultipartUploadCommand</code>. La clave tiene el formato <code>uploads/{uuid}-{filename}</code>.</p>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <span class="endpoint-path">/api/upload/part-url</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Devuelve una URL prefirmada para que el navegador haga PUT de un fragmento directamente a R2.</p>
+          <strong style="font-size:13px;color:var(--muted);">REQUEST</strong>
+          <pre>{ "key": "uploads/uuid-video.mp4", "uploadId": "abc123", "partNumber": 1 }</pre>
+          <strong style="font-size:13px;color:var(--muted);">RESPONSE</strong>
+          <pre>{ "url": "https://...r2.cloudflarestorage.com/...?X-Amz-Signature=..." }</pre>
+          <p>Usa <code>getSignedUrl</code> + <code>UploadPartCommand</code>. URL válida por <strong>1 hora</strong>.</p>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <span class="endpoint-path">/api/upload/complete</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Finaliza la carga multiparte después de confirmar todas las partes.</p>
+          <strong style="font-size:13px;color:var(--muted);">REQUEST</strong>
+          <pre>{ "key": "...", "uploadId": "...", "parts": [{ "PartNumber": 1, "ETag": "\"etag1\"" }] }</pre>
+          <strong style="font-size:13px;color:var(--muted);">RESPONSE</strong>
+          <pre>{ "url": "https://pub-xxx.r2.dev/uploads/uuid-video.mp4" }</pre>
+          <p>Llama a <code>CompleteMultipartUploadCommand</code>. La URL pública es <code>${R2_PUBLIC_URL}/${key}</code>.</p>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method delete">DELETE</span>
+          <span class="endpoint-path">/api/upload/abort</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Cancela una carga multiparte y elimina los datos parciales de R2.</p>
+          <strong style="font-size:13px;color:var(--muted);">REQUEST</strong>
+          <pre>{ "key": "uploads/uuid-video.mp4", "uploadId": "abc123" }</pre>
+          <strong style="font-size:13px;color:var(--muted);">RESPONSE</strong>
+          <pre>{ "success": true }</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. Componentes -->
+    <section id="components">
+      <div class="section-header">
+        <div class="section-num">8</div>
+        <h2>Componentes</h2>
+      </div>
+
+      <h3>DropZone <span class="tag tag-blue">src/components/DropZone.tsx</span></h3>
+      <p><strong>Props:</strong> <code>onFile(file: File) =&gt; void</code></p>
+      <p>Renderiza el área de destino. Gestiona <code>dragover</code> / <code>dragleave</code> para el estado visual, <code>drop</code> para extraer el archivo y un <code>&lt;input type="file"&gt;</code> como fallback. Valida que el archivo no esté vacío y no supere 25 GB.</p>
+
+      <h3>UploadPanel <span class="tag tag-blue">src/components/UploadPanel.tsx</span></h3>
+      <p><strong>Props:</strong> <code>file</code>, <code>progress</code>, <code>error</code>, <code>onCancel</code>, <code>onReset</code></p>
+      <p>Activo durante las fases <code>uploading</code> y <code>error</code>. Muestra nombre y tamaño del archivo, barra de progreso animada, velocidad, ETA, contador de partes, y caja de alerta de error. Incluye botón de cancelar (durante subida) y reiniciar (en error).</p>
+
+      <h3>ResultPanel <span class="tag tag-blue">src/components/ResultPanel.tsx</span></h3>
+      <p><strong>Props:</strong> <code>phase</code>, <code>file</code>, <code>url</code>, <code>onReset</code></p>
+      <p>Activo tras finalizar la carga. Muestra ✅ en éxito o ⛔ en cancelación. En éxito: URL en caja monoespaciada con botón de copia y enlace "Abrir archivo".</p>
+
+      <h3>App <span class="tag tag-blue">src/App.tsx</span></h3>
+      <p>Enrutador de fases basado en el hook <code>useUpload</code>:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Fase</th><th>Componente renderizado</th></tr></thead>
+          <tbody>
+            <tr><td><code>idle</code></td><td><code>&lt;DropZone onFile={upload} /&gt;</code></td></tr>
+            <tr><td><code>uploading</code> | <code>error</code></td><td><code>&lt;UploadPanel ... /&gt;</code></td></tr>
+            <tr><td><code>success</code> | <code>cancelled</code></td><td><code>&lt;ResultPanel ... /&gt;</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 9. Estado y lógica -->
+    <section id="state">
+      <div class="section-header">
+        <div class="section-num">9</div>
+        <h2>Estado y lógica de carga</h2>
+      </div>
+      <p>Hook principal: <code>src/hooks/useUpload.ts</code></p>
+
+      <h3>Constantes</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Constante</th><th>Valor</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>CHUNK_SIZE</code></td><td>100 MB</td><td>Bytes por fragmento de carga</td></tr>
+            <tr><td><code>MAX_CONCURRENT</code></td><td>4</td><td>XHRs simultáneos máximos</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Refs internas (no estado, evitan re-renders)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ref</th><th>Tipo</th><th>Propósito</th></tr></thead>
+          <tbody>
+            <tr><td><code>cancelledRef</code></td><td><code>boolean</code></td><td>Activado al cancelar</td></tr>
+            <tr><td><code>userCancelRef</code></td><td><code>boolean</code></td><td>Distingue cancelación de usuario vs error</td></tr>
+            <tr><td><code>activeXHRs</code></td><td><code>Set&lt;XMLHttpRequest&gt;</code></td><td>Todos los XHR activos para abortarlos</td></tr>
+            <tr><td><code>uploadRef</code></td><td><code>{ key, uploadId }</code></td><td>Almacenado para limpieza al cancelar</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Flujo de <code>upload(file)</code></h3>
+      <pre>1. phase = 'uploading', guardar archivo en estado
+2. POST /api/upload/init → { uploadId, key }
+3. Dividir archivo en N partes: Math.ceil(size / CHUNK_SIZE)
+4. Por cada parte (Semáforo, máx. 4 concurrentes):
+   a. POST /api/upload/part-url → URL prefirmada
+   b. xhrPutWithRetry(url, blob, onProgress) → ETag
+   c. Actualizar partBytes[i] para cálculo de progreso
+   d. Incrementar completedParts
+5. POST /api/upload/complete con todos los ETags
+6. phase = 'success', resultUrl = URL pública</pre>
+
+      <h3>Cálculo de progreso</h3>
+      <pre>totalSubido = sum(partBytes)
+pct          = totalSubido / file.size * 100
+
+Por tick de RAF:
+  speed = α × (Δbytes / Δt) + (1 - α) × velocidadAnterior   // α = 0.3 EMA
+  eta   = (file.size - totalSubido) / speed</pre>
+    </section>
+
+    <!-- 10. Utilidades -->
+    <section id="utils">
+      <div class="section-header">
+        <div class="section-num">10</div>
+        <h2>Utilidades</h2>
+      </div>
+
+      <h3>Semaphore <span class="tag tag-purple">src/utils/uploader.ts</span></h3>
+      <p>Limita operaciones asíncronas concurrentes. Implementación basada en cola.</p>
+      <pre>class Semaphore {
+  constructor(max: number)
+  run&lt;T&gt;(fn: () =&gt; Promise&lt;T&gt;): Promise&lt;T&gt;
+  // adquirir → ejecutar fn → liberar
+}</pre>
+
+      <h3>xhrPut</h3>
+      <p>PUT binario con XMLHttpRequest. Llama a <code>onProgress(bytesSubidos)</code>, extrae el ETag de las cabeceras, acepta códigos 200–299. Soporta cancelación.</p>
+
+      <h3>xhrPutWithRetry</h3>
+      <p>Envuelve <code>xhrPut</code> con backoff exponencial:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Intento</th><th>Espera antes de reintentar</th></tr></thead>
+          <tbody>
+            <tr><td>1 (inicial)</td><td>—</td></tr>
+            <tr><td>2</td><td>1 000 ms</td></tr>
+            <tr><td>3</td><td>2 000 ms</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>fmtBytes / fmtTime <span class="tag tag-purple">src/utils/format.ts</span></h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Función</th><th>Entrada</th><th>Salida</th></tr></thead>
+          <tbody>
+            <tr><td><code>fmtBytes</code></td><td>1 500</td><td><code>1.5 KB</code></td></tr>
+            <tr><td><code>fmtBytes</code></td><td>5 242 880</td><td><code>5.0 MB</code></td></tr>
+            <tr><td><code>fmtTime</code></td><td>330</td><td><code>5m 30s</code></td></tr>
+            <tr><td><code>fmtTime</code></td><td>8 100</td><td><code>2h 15m</code></td></tr>
+            <tr><td><code>fmtTime</code></td><td>NaN / ≤ 0</td><td><code>—</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 11. Tipos -->
+    <section id="types">
+      <div class="section-header">
+        <div class="section-num">11</div>
+        <h2>Tipos de datos</h2>
+      </div>
+      <pre>// src/types.ts
+
+type UploadPhase = 'idle' | 'uploading' | 'success' | 'error' | 'cancelled'
+
+interface UploadProgress {
+  pct: number            // 0–100
+  speed: number          // bytes/segundo
+  eta: number | null     // segundos restantes (null si desconocido)
+  completedParts: number
+  totalParts: number
+}
+
+interface Part {
+  PartNumber: number     // índice base 1
+  ETag: string           // de la cabecera de respuesta de R2 (string entre comillas)
+}</pre>
+    </section>
+
+    <!-- 12. Diseño -->
+    <section id="design">
+      <div class="section-header">
+        <div class="section-num">12</div>
+        <h2>Sistema de diseño</h2>
+      </div>
+
+      <h3>Tokens de color</h3>
+      <div class="token-grid">
+        <div class="token-item">
+          <div class="token-swatch" style="background:#2563EB;"></div>
+          <div class="token-info">
+            <div class="token-name">--primary</div>
+            <div class="token-value">#2563EB</div>
+          </div>
+        </div>
+        <div class="token-item">
+          <div class="token-swatch" style="background:#1D4ED8;"></div>
+          <div class="token-info">
+            <div class="token-name">--primary-dark</div>
+            <div class="token-value">#1D4ED8</div>
+          </div>
+        </div>
+        <div class="token-item">
+          <div class="token-swatch" style="background:#DC2626;"></div>
+          <div class="token-info">
+            <div class="token-name">--error</div>
+            <div class="token-value">#DC2626</div>
+          </div>
+        </div>
+        <div class="token-item">
+          <div class="token-swatch" style="background:#F1F5F9;border-top:1px solid #E2E8F0;"></div>
+          <div class="token-info">
+            <div class="token-name">--bg</div>
+            <div class="token-value">#F1F5F9</div>
+          </div>
+        </div>
+        <div class="token-item">
+          <div class="token-swatch" style="background:#FFFFFF;border-top:1px solid #E2E8F0;"></div>
+          <div class="token-info">
+            <div class="token-name">--surface</div>
+            <div class="token-value">#FFFFFF</div>
+          </div>
+        </div>
+        <div class="token-item">
+          <div class="token-swatch" style="background:#0F172A;"></div>
+          <div class="token-info">
+            <div class="token-name">--text</div>
+            <div class="token-value">#0F172A</div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Clases CSS principales</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Clase</th><th>Descripción</th></tr></thead>
+          <tbody>
+            <tr><td><code>.card</code></td><td>Contenedor blanco centrado con sombra</td></tr>
+            <tr><td><code>.drop-zone</code></td><td>Rectángulo con borde discontinuo y hover</td></tr>
+            <tr><td><code>.drop-zone.dragging</code></td><td>Estado activo al arrastrar</td></tr>
+            <tr><td><code>.prog-fill</code></td><td>Barra de progreso degradado (azul → púrpura)</td></tr>
+            <tr><td><code>.dot</code></td><td>Punto parpadeante animado (CSS keyframes)</td></tr>
+            <tr><td><code>.alert-error</code></td><td>Caja de mensaje de error (fondo rojo)</td></tr>
+            <tr><td><code>.link-box</code></td><td>Contenedor de URL en fuente monoespaciada</td></tr>
+            <tr><td><code>.btn-primary</code></td><td>Botón azul sólido</td></tr>
+            <tr><td><code>.btn-outline</code></td><td>Botón con borde</td></tr>
+            <tr><td><code>.btn-danger</code></td><td>Botón de cancelar (rojo)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 13. Flujo E2E -->
+    <section id="flow">
+      <div class="section-header">
+        <div class="section-num">13</div>
+        <h2>Flujo de carga E2E</h2>
+      </div>
+      <div class="diagram">
+El usuario suelta el archivo
+       │
+       ▼
+<span class="highlight">DropZone</span> valida tamaño (≤ 25 GB) y llama a <span class="label">onFile(file)</span>
+       │
+       ▼
+<span class="highlight">useUpload.upload(file)</span>
+       │
+       ├─ POST <span class="label">/api/upload/init</span> ──────────────────► R2.CreateMultipartUpload
+       │     ◄── <span class="label">{ uploadId, key }</span> ◄──────────────────────────────────────
+       │
+       ├─ Dividir archivo en N partes (100 MB c/u)
+       │
+       ├─ [<span class="highlight">Semáforo: máx. 4 concurrentes</span>]
+       │    Para cada parte i:
+       │    ├─ POST <span class="label">/api/upload/part-url</span> ──────────► Prefirmar UploadPart URL
+       │    │     ◄── <span class="label">{ url }</span> ◄─────────────────────────────────────────────
+       │    │
+       │    └─ PUT <span class="label">URL prefirmada</span> ──────────────► R2 (chunk binario)
+       │          xhrPutWithRetry (3 intentos, backoff)
+       │          onProgress → partBytes[i] → RAF → setState
+       │          ◄── <span class="label">ETag</span> ◄──────────────────────────────────────────────
+       │
+       ├─ POST <span class="label">/api/upload/complete</span> { parts: [{PartNumber, ETag}...] }
+       │     ◄── <span class="label">{ url: "https://pub-xxx.r2.dev/uploads/uuid-archivo" }</span> ◄──
+       │
+       └─ setState({ <span class="highlight">phase: 'success'</span>, resultUrl })
+              │
+              ▼
+       <span class="highlight">ResultPanel</span>: URL + botón copiar
+      </div>
+
+      <h3>Ruta de cancelación</h3>
+      <div class="diagram">
+El usuario hace clic en Cancelar
+       │
+       ▼
+<span class="highlight">cancelledRef = true</span> → todos los XHR abortados
+       │
+       ▼
+DELETE <span class="label">/api/upload/abort</span> → R2.AbortMultipartUpload (limpia datos parciales)
+       │
+       ▼
+<span class="highlight">phase = 'cancelled'</span> → ResultPanel (mensaje de cancelación)
+      </div>
+    </section>
+
+    <!-- 14. Errores -->
+    <section id="errors">
+      <div class="section-header">
+        <div class="section-num">14</div>
+        <h2>Manejo de errores y resiliencia</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Escenario</th><th>Comportamiento</th></tr></thead>
+          <tbody>
+            <tr><td>Archivo > 25 GB</td><td>Rechazado en DropZone antes de iniciar la carga</td></tr>
+            <tr><td>Archivo vacío</td><td>Rechazado en DropZone</td></tr>
+            <tr><td>Fallo en una parte</td><td>Reintentado hasta 3× con backoff exponencial</td></tr>
+            <tr><td>Todos los reintentos agotados</td><td><code>phase = 'error'</code>, mensaje mostrado, otros XHR abortados</td></tr>
+            <tr><td>Cancelación del usuario</td><td>Todos los XHR abortados inmediatamente, API abort invocada</td></tr>
+            <tr><td>Error del servidor (init/complete)</td><td><code>phase = 'error'</code>, usuario ve mensaje de error</td></tr>
+            <tr><td>Pérdida de red durante carga</td><td>XHR falla → lógica de reintentos se activa</td></tr>
+            <tr><td>Fallo al copiar al portapapeles</td><td>Fallback a <code>document.execCommand('copy')</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 15. Seguridad -->
+    <section id="security">
+      <div class="section-header">
+        <div class="section-num">15</div>
+        <h2>Modelo de seguridad</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Amenaza</th><th>Mitigación</th></tr></thead>
+          <tbody>
+            <tr><td>Credenciales de R2</td><td>Almacenadas en <code>.env</code>, nunca expuestas al cliente</td></tr>
+            <tr><td>Mal uso de URL prefirmada</td><td>TTL de 1 hora limita la ventana de uso indebido</td></tr>
+            <tr><td>Archivos demasiado grandes</td><td>Validación en cliente (UX); sin validación en servidor</td></tr>
+            <tr><td>Tipo de contenido arbitrario</td><td>Pasado desde el cliente; R2 acepta cualquier valor</td></tr>
+            <tr><td>Colisión de claves / path traversal</td><td>Prefijo UUID previene colisiones y traversal</td></tr>
+            <tr><td>Acceso sin autenticación</td><td>⚠️ La app no tiene capa de autenticación</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout warning">
+        <div class="callout-icon">⚠️</div>
+        <div>No hay limitación de velocidad ni cuota de carga. Cualquier cliente con acceso de red puede subir archivos. Considera añadir autenticación y rate limiting antes de desplegar en un entorno no confiable.</div>
+      </div>
+    </section>
+
+    <!-- 16. Build -->
+    <section id="build">
+      <div class="section-header">
+        <div class="section-num">16</div>
+        <h2>Build y despliegue</h2>
+      </div>
+      <h3>Desarrollo</h3>
+      <pre>cp .env.example .env        # Completar credenciales de R2
+npm install
+npm run dev                  # Vite (:5173) + Express (:3000) concurrentes</pre>
+      <p>Vite redirige <code>/api/*</code> a Express para que ambos operen desde el mismo origen en el navegador.</p>
+
+      <h3>Producción</h3>
+      <pre>npm run build                # tsc + vite build → dist/
+npm start                    # Express sirve dist/ + rutas /api/* en PORT</pre>
+
+      <h3>Modo producción de Express</h3>
+      <ul style="margin:12px 0 0 20px;color:#CBD5E1;font-size:14px;line-height:2;">
+        <li>Sirve <code>dist/</code> como archivos estáticos</li>
+        <li>Redirige todas las rutas no-API a <code>dist/index.html</code> (enrutamiento SPA)</li>
+        <li>Gestiona <code>/api/*</code> para la orquestación de R2</li>
+      </ul>
+
+      <div class="callout info">
+        <div class="callout-icon">ℹ️</div>
+        <div>La app es un servidor Node.js tradicional — despliega en cualquier VPS, contenedor o PaaS que soporte Node.js (Railway, Render, Fly.io, AWS EC2). No es compatible con entornos serverless sin adaptación.</div>
+      </div>
+    </section>
+
+    <!-- 17. Límites -->
+    <section id="limits">
+      <div class="section-header">
+        <div class="section-num">17</div>
+        <h2>Límites y restricciones</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Restricción</th><th>Valor</th><th>Notas</th></tr></thead>
+          <tbody>
+            <tr><td>Tamaño máximo de archivo</td><td>25 GB</td><td>Solo validación en cliente</td></tr>
+            <tr><td>Tamaño de fragmento</td><td>100 MB</td><td>Hardcodeado en <code>useUpload.ts</code></td></tr>
+            <tr><td>Partes concurrentes máx.</td><td>4</td><td>Hardcodeado en <code>useUpload.ts</code></td></tr>
+            <tr><td>TTL de URL prefirmada</td><td>1 hora</td><td>Definido en <code>server.js</code></td></tr>
+            <tr><td>Intentos de reintento por parte</td><td>3</td><td>En <code>xhrPutWithRetry</code></td></tr>
+            <tr><td>Tamaño mínimo de parte en R2</td><td>5 MB</td><td>R2 lo exige (excepto última parte)</td></tr>
+            <tr><td>Partes máximas en R2</td><td>10 000</td><td>Con fragmentos de 100 MB: ~1 TB máx.</td></tr>
+            <tr><td>Memoria del navegador</td><td>N/A</td><td>Los fragmentos se cortan del objeto <code>File</code> (sin carga completa)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 18. Mejoras -->
+    <section id="improvements">
+      <div class="section-header">
+        <div class="section-num">18</div>
+        <h2>Mejoras propuestas</h2>
+      </div>
+
+      <h3>UX / Producto</h3>
+      <ul class="checklist">
+        <li>Cola de múltiples archivos (carga por lotes)</li>
+        <li>Restricciones de tipo de archivo (prop <code>accept</code> en DropZone)</li>
+        <li>Vista previa de miniaturas para imágenes y vídeos</li>
+        <li>Historial de subidas (localStorage)</li>
+        <li>Enlaces cortos compartibles</li>
+      </ul>
+
+      <h3>Fiabilidad</h3>
+      <ul class="checklist">
+        <li>Reanudar cargas interrumpidas (persistir <code>uploadId</code> + <code>key</code> en sessionStorage)</li>
+        <li>Tamaño de fragmento y concurrencia configurables</li>
+        <li>Validación de tamaño de archivo en servidor</li>
+        <li>Webhook al completar la carga</li>
+      </ul>
+
+      <h3>Seguridad y operaciones</h3>
+      <ul class="checklist">
+        <li>Autenticación (magic link, OAuth)</li>
+        <li>Rate limiting en endpoints de la API</li>
+        <li>URLs de descarga firmadas con expiración (en lugar de bucket público)</li>
+        <li>Reglas de ciclo de vida de objetos (auto-eliminar tras N días)</li>
+        <li>Integración de análisis de virus</li>
+      </ul>
+
+      <h3>Experiencia de desarrollador</h3>
+      <ul class="checklist">
+        <li>Tests unitarios para <code>useUpload</code>, <code>uploader.ts</code>, <code>format.ts</code></li>
+        <li>Tests E2E (Playwright / Cypress)</li>
+        <li>Configuración con Docker Compose</li>
+        <li>Pipeline CI/CD</li>
+        <li><code>CHUNK_SIZE</code> y <code>MAX_CONCURRENT</code> configurables vía variables de entorno</li>
+      </ul>
+    </section>
+
+    <div style="border-top:1px solid var(--border);padding-top:24px;margin-top:40px;color:var(--muted);font-size:13px;text-align:center;">
+      Especificación generada a partir del análisis del código fuente · RocketDrop v1.0.0
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // Highlight active sidebar link on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const links = document.querySelectorAll('.sidebar nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.sidebar nav a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
