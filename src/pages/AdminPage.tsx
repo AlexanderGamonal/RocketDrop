@@ -8,7 +8,6 @@ function FileRow({ file, onDeleted }: { file: AdminFile; onDeleted: () => void }
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting]     = useState(false);
   const [copied, setCopied]         = useState(false);
-
   const isImage = /\.(jpe?g|png|gif|webp|svg|avif)$/i.test(file.name);
 
   const copyUrl = async () => {
@@ -44,12 +43,7 @@ function FileRow({ file, onDeleted }: { file: AdminFile; onDeleted: () => void }
           <span className="admin-dot">·</span>
           {new Date(file.lastModified).toLocaleDateString()}
         </p>
-        <a
-          href={file.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="admin-file-url"
-        >
+        <a href={file.url} target="_blank" rel="noopener noreferrer" className="admin-file-url">
           {file.url}
         </a>
       </div>
@@ -58,30 +52,18 @@ function FileRow({ file, onDeleted }: { file: AdminFile; onDeleted: () => void }
         <button className="btn btn-sm btn-ghost" onClick={copyUrl}>
           {copied ? '✓ Copied' : 'Copy URL'}
         </button>
-
         {confirming ? (
           <div className="confirm-row">
-            <span className="confirm-label">Delete?</span>
-            <button
-              className="btn btn-sm btn-danger"
-              onClick={handleDelete}
-              disabled={deleting}
-            >
+            <span className="confirm-label">Sure?</span>
+            <button className="btn btn-sm btn-danger" onClick={handleDelete} disabled={deleting}>
               {deleting ? '…' : 'Yes'}
             </button>
-            <button
-              className="btn btn-sm btn-ghost"
-              onClick={() => setConfirming(false)}
-              disabled={deleting}
-            >
+            <button className="btn btn-sm btn-ghost" onClick={() => setConfirming(false)} disabled={deleting}>
               No
             </button>
           </div>
         ) : (
-          <button
-            className="btn btn-sm btn-danger"
-            onClick={() => setConfirming(true)}
-          >
+          <button className="btn btn-sm btn-danger" onClick={() => setConfirming(true)}>
             Delete
           </button>
         )}
@@ -116,58 +98,54 @@ export function AdminPage() {
 
   return (
     <div className="admin-wrapper">
-      <div className="admin-card">
-        <header className="admin-header">
-          <div className="admin-header-left">
-            <Link to="/" className="back-link">← RocketDrop</Link>
-            <h1 className="admin-title">Admin Panel</h1>
-          </div>
-          <div className="admin-stats">
-            {!loading && !error && (
-              <span>{files.length} file{files.length !== 1 ? 's' : ''} · {fmtBytes(totalSize)}</span>
-            )}
-            <button className="btn btn-sm btn-ghost" onClick={load} disabled={loading}>
-              {loading ? '…' : '↻ Refresh'}
-            </button>
-          </div>
-        </header>
-
-        <div className="admin-body">
-          {loading && (
-            <div className="admin-empty">
-              <div className="skeleton-rows">
-                {[1,2,3].map(i => <div key={i} className="skeleton-row" />)}
-              </div>
-            </div>
-          )}
-
-          {!loading && error && (
-            <div className="admin-error">
-              <span>⚠ {error}</span>
-              <button className="btn btn-sm btn-ghost" onClick={load}>Retry</button>
-            </div>
-          )}
-
-          {!loading && !error && files.length === 0 && (
-            <div className="admin-empty">
-              <span className="admin-empty-icon">📭</span>
-              <p>No files uploaded yet.</p>
-              <Link to="/" className="btn btn-primary">Upload your first file</Link>
-            </div>
-          )}
-
-          {!loading && !error && files.length > 0 && (
-            <div className="admin-list">
-              {files.map(f => (
-                <FileRow
-                  key={f.key}
-                  file={f}
-                  onDeleted={() => setFiles(prev => prev.filter(x => x.key !== f.key))}
-                />
-              ))}
-            </div>
-          )}
+      <header className="admin-topbar">
+        <div className="admin-topbar-left">
+          <Link to="/" className="back-link">← Back</Link>
+          <h1 className="admin-title">Admin Panel</h1>
         </div>
+        <div className="admin-stats">
+          {!loading && !error && (
+            <span>{files.length} file{files.length !== 1 ? 's' : ''} · {fmtBytes(totalSize)}</span>
+          )}
+          <button className="btn btn-sm btn-ghost" onClick={load} disabled={loading}>
+            {loading ? '…' : '↻ Refresh'}
+          </button>
+        </div>
+      </header>
+
+      <div className="admin-body">
+        {loading && (
+          <div className="skeleton-rows">
+            {[1, 2, 3].map(i => <div key={i} className="skeleton-row" />)}
+          </div>
+        )}
+
+        {!loading && error && (
+          <div className="admin-error">
+            <span>⚠ {error}</span>
+            <button className="btn btn-sm btn-ghost" onClick={load}>Retry</button>
+          </div>
+        )}
+
+        {!loading && !error && files.length === 0 && (
+          <div className="admin-empty">
+            <span className="admin-empty-icon">📭</span>
+            <p>No files uploaded yet.</p>
+            <Link to="/" className="btn btn-primary">Upload your first file</Link>
+          </div>
+        )}
+
+        {!loading && !error && files.length > 0 && (
+          <div className="admin-list">
+            {files.map(f => (
+              <FileRow
+                key={f.key}
+                file={f}
+                onDeleted={() => setFiles(prev => prev.filter(x => x.key !== f.key))}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

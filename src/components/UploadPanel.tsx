@@ -15,9 +15,9 @@ export function UploadPanel({ file, progress, error, onCancel, onReset }: Props)
 
   return (
     <div className="upload-panel">
-      <div className="file-row">
-        <span className="file-icon">📄</span>
-        <div className="file-meta">
+      <div className="upload-file-row">
+        <div className="upload-file-icon">📄</div>
+        <div className="upload-file-meta">
           <div className="file-name">{file.name}</div>
           <div className="file-size">{fmtBytes(file.size)}</div>
         </div>
@@ -30,36 +30,35 @@ export function UploadPanel({ file, progress, error, onCancel, onReset }: Props)
         </div>
       )}
 
-      <div className="prog-wrapper">
-        <div className="prog-header">
-          <span>
-            {!isError && <span className="dot" />}
-            <span>{isError ? 'Upload failed' : 'Uploading…'}</span>
-          </span>
-          <span className="prog-pct">{Math.round(pct)}%</span>
+      <div className="upload-pct-row">
+        <div className="upload-status">
+          {!isError && <span className="dot" />}
+          <span>{isError ? 'Upload failed' : 'Uploading…'}</span>
         </div>
-        <div className="prog-track">
-          <div className="prog-fill" style={{ width: `${Math.min(pct, 100)}%` }} />
-        </div>
-        <div className="prog-stats">
-          <span>{speed > 0 ? `${fmtBytes(speed)}/s` : '— MB/s'}</span>
-          <span>{eta !== null ? `${fmtTime(eta)} remaining` : 'Calculating…'}</span>
-        </div>
+        <span className="upload-pct">{Math.round(pct)}%</span>
       </div>
 
-      <div className="parts-label">
-        Parts: {completedParts} / {totalParts}
+      <div className="prog-track">
+        <div className="prog-fill" style={{ width: `${Math.min(pct, 100)}%` }} />
       </div>
 
-      <div className="action-row">
+      <div className="upload-stats">
+        <span className="stat-pill">
+          <strong>{speed > 0 ? `${fmtBytes(speed)}/s` : '—'}</strong>
+        </span>
+        <span className="stat-pill">
+          {eta !== null ? <><strong>{fmtTime(eta)}</strong> left</> : 'Calculating…'}
+        </span>
+        <span className="stat-pill">
+          Parts <strong>{completedParts}/{totalParts}</strong>
+        </span>
+      </div>
+
+      <div className="upload-actions">
         {isError ? (
-          <button className="btn btn-outline" onClick={onReset}>
-            ↩ Start over
-          </button>
+          <button className="btn btn-outline" onClick={onReset}>↩ Start over</button>
         ) : (
-          <button className="btn btn-danger" onClick={onCancel}>
-            ✕ Cancel
-          </button>
+          <button className="btn btn-danger" onClick={onCancel}>✕ Cancel</button>
         )}
       </div>
     </div>

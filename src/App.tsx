@@ -9,21 +9,18 @@ export default function App() {
   const { phase, file, progress, resultUrl, error, selectFile, confirmUpload, cancel, reset } = useUpload();
 
   return (
-    <div className="wrapper">
-      <div className="card">
-        <header className="card-header">
-          <span className="logo">🚀</span>
-          <div className="card-header-text">
-            <h1>RocketDrop</h1>
-            <p>Upload files up to 25 GB directly to the cloud</p>
-          </div>
-          <Link to="/admin" className="admin-link">Admin</Link>
-        </header>
+    <div className="app">
+      <header className="topbar">
+        <div className="topbar-brand">
+          <span className="topbar-rocket">🚀</span>
+          <span className="topbar-name">RocketDrop</span>
+        </div>
+        <Link to="/admin" className="topbar-admin">Admin</Link>
+      </header>
 
-        <main className="card-body">
-          {phase === 'idle' && (
-            <DropZone onFile={selectFile} />
-          )}
+      <main className="app-main">
+        <div className="panel-wrap">
+          {phase === 'idle' && <DropZone onFile={selectFile} />}
 
           {phase === 'preview' && file && (
             <PreviewPanel
@@ -51,8 +48,8 @@ export default function App() {
               onReset={reset}
             />
           )}
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
