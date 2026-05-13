@@ -1,10 +1,10 @@
 import { useCallback, useRef, useState } from 'react';
 import type { Part, UploadPhase, UploadProgress } from '../types';
-import { initUpload, getPartUrl, completeUpload, abortUpload } from '../api';
+import { initUpload, getAllPartUrls, completeUpload, abortUpload } from '../api';
 import { Semaphore, xhrPutWithRetry } from '../utils/uploader';
 
-const CHUNK_SIZE = 100 * 1024 * 1024; // 100 MB
-const MAX_CONCURRENT = 4;
+const CHUNK_SIZE = 32 * 1024 * 1024;  // 32 MB — mejor paralelismo
+const MAX_CONCURRENT = 8;             // 8 streams simultáneos
 const MAX_SIZE = 25 * 1024 * 1024 * 1024; // 25 GB
 
 interface UploadState {
@@ -56,8 +56,8 @@ export function useUpload() {
 
   // Validates file and moves to preview phase — no upload yet.
   const selectFile = useCallback((file: File) => {
-    if (file.size > MAX_SIZE) { alert('File exceeds the 25 GB limit.'); return; }
-    if (file.size === 0)      { alert('Cannot upload an empty file.'); return; }
+    if (file.size > MAX_SIZE) { alert('El archivo supera el límite de 25 GB.'); return; }
+    if (file.size === 0)      { alert('No se puede subir un archivo vacío.'); return; }
     setState(prev => ({ ...prev, phase: 'preview', file }));
   }, []);
 
@@ -120,6 +120,10 @@ export function useUpload() {
       uploadRef.current = { key, uploadId };
       if (cancelledRef.current) throw new Error('cancelled');
 
+      // Prefetch todas las URLs firmadas en una sola llamada al servidor
+      const { urls } = await getAllPartUrls(key, uploadId, totalParts);
+      if (cancelledRef.current) throw new Error('cancelled');
+
       const sem = new Semaphore(MAX_CONCURRENT);
       const promises: Promise<Part>[] = Array.from({ length: totalParts }, (_, i) =>
         sem.run(async (): Promise<Part> => {
@@ -130,11 +134,8 @@ export function useUpload() {
           const end        = Math.min(start + CHUNK_SIZE, file.size);
           const blob       = file.slice(start, end);
 
-          const { url } = await getPartUrl(key, uploadId, partNumber);
-          if (cancelledRef.current) throw new Error('cancelled');
-
           const etag = await xhrPutWithRetry(
-            url,
+            urls[i],
             blob,
             loaded => { partBytes[i] = loaded; scheduleRender(); },
             () => cancelledRef.current,
