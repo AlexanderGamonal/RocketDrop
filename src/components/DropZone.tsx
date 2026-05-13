@@ -1,7 +1,5 @@
 import { useState, useRef, type DragEvent, type ChangeEvent } from 'react';
 
-const MAX_SIZE = 25 * 1024 * 1024 * 1024;
-
 interface Props {
   onFile: (file: File) => void;
 }
@@ -12,8 +10,6 @@ export function DropZone({ onFile }: Props) {
 
   const handle = (file: File | undefined) => {
     if (!file) return;
-    if (file.size > MAX_SIZE) { alert('File exceeds the 25 GB limit.'); return; }
-    if (file.size === 0) { alert('Cannot upload an empty file.'); return; }
     onFile(file);
   };
 

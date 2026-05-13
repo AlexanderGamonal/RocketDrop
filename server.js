@@ -7,6 +7,8 @@ const {
   UploadPartCommand,
   CompleteMultipartUploadCommand,
   AbortMultipartUploadCommand,
+  ListObjectsV2Command,
+  DeleteObjectCommand,
 } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const { v4: uuidv4 } = require('uuid');
@@ -118,6 +120,55 @@ app.delete('/api/upload/abort', async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error('[abort]', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/admin/files
+// Returns: [{ key, name, size, lastModified, url }]
+app.get('/api/admin/files', async (_req, res) => {
+  try {
+    const results = [];
+    let continuationToken;
+
+    do {
+      const cmd = new ListObjectsV2Command({
+        Bucket: BUCKET,
+        Prefix: 'uploads/',
+        ContinuationToken: continuationToken,
+      });
+      const page = await s3.send(cmd);
+      for (const obj of page.Contents ?? []) {
+        results.push({
+          key: obj.Key,
+          name: obj.Key.replace(/^uploads\/[^-]+-/, ''),
+          size: obj.Size,
+          lastModified: obj.LastModified,
+          url: `${process.env.R2_PUBLIC_URL}/${obj.Key}`,
+        });
+      }
+      continuationToken = page.NextContinuationToken;
+    } while (continuationToken);
+
+    res.json(results);
+  } catch (err) {
+    console.error('[admin/files]', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/admin/files
+// Body: { key }
+// Returns: { success: true }
+app.delete('/api/admin/files', async (req, res) => {
+  const { key } = req.body;
+  if (!key) return res.status(400).json({ error: 'key required' });
+
+  try {
+    await s3.send(new DeleteObjectCommand({ Bucket: BUCKET, Key: key }));
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[admin/delete]', err.message);
     res.status(500).json({ error: err.message });
   }
 });

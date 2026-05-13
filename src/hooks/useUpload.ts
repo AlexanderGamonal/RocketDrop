@@ -5,6 +5,7 @@ import { Semaphore, xhrPutWithRetry } from '../utils/uploader';
 
 const CHUNK_SIZE = 100 * 1024 * 1024; // 100 MB
 const MAX_CONCURRENT = 4;
+const MAX_SIZE = 25 * 1024 * 1024 * 1024; // 25 GB
 
 interface UploadState {
   phase: UploadPhase;
@@ -53,7 +54,15 @@ export function useUpload() {
     setState(INITIAL_STATE);
   }, []);
 
-  const upload = useCallback(async (file: File) => {
+  // Validates file and moves to preview phase — no upload yet.
+  const selectFile = useCallback((file: File) => {
+    if (file.size > MAX_SIZE) { alert('File exceeds the 25 GB limit.'); return; }
+    if (file.size === 0)      { alert('Cannot upload an empty file.'); return; }
+    setState(prev => ({ ...prev, phase: 'preview', file }));
+  }, []);
+
+  // Starts the actual multipart upload to R2 for the previewed file.
+  const confirmUpload = useCallback(async (file: File) => {
     cancelledRef.current  = false;
     userCancelRef.current = false;
     uploadRef.current     = null;
@@ -63,12 +72,10 @@ export function useUpload() {
     const partBytes  = new Array<number>(totalParts).fill(0);
     let completedParts = 0;
 
-    // Exponential moving average for speed
     let smoothSpeed = 0;
     let lastBytes   = 0;
     let lastTime    = Date.now();
 
-    // Throttle DOM updates to one per animation frame
     let rafId: number | null = null;
     const scheduleRender = () => {
       if (rafId !== null) return;
@@ -169,5 +176,5 @@ export function useUpload() {
     }
   }, []);
 
-  return { ...state, upload, cancel, reset };
+  return { ...state, selectFile, confirmUpload, cancel, reset };
 }

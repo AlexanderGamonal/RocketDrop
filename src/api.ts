@@ -1,4 +1,4 @@
-import type { Part } from './types';
+import type { AdminFile, Part } from './types';
 
 async function call<T>(method: string, path: string, body?: unknown): Promise<T> {
   const res = await fetch(path, {
@@ -22,3 +22,9 @@ export const completeUpload = (key: string, uploadId: string, parts: Part[]) =>
 
 export const abortUpload = (key: string, uploadId: string) =>
   call<{ success: boolean }>('DELETE', '/api/upload/abort', { key, uploadId });
+
+export const listFiles = () =>
+  call<AdminFile[]>('GET', '/api/admin/files');
+
+export const deleteFile = (key: string) =>
+  call<{ success: boolean }>('DELETE', '/api/admin/files', { key });

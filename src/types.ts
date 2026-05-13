@@ -1,4 +1,12 @@
-export type UploadPhase = 'idle' | 'uploading' | 'success' | 'error' | 'cancelled';
+export type UploadPhase = 'idle' | 'preview' | 'uploading' | 'success' | 'error' | 'cancelled';
+
+export interface AdminFile {
+  key: string;
+  name: string;
+  size: number;
+  lastModified: string;
+  url: string;
+}
 
 export interface UploadProgress {
   pct: number;
