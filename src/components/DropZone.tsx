@@ -29,9 +29,9 @@ export function DropZone({ onFile }: Props) {
       <div className="dz-icon-wrap">
         <span className="dz-icon">📁</span>
       </div>
-      <h2>Drop your file here</h2>
-      <p>or click to browse your files</p>
-      <span className="dz-hint">Max 25 GB · Any format</span>
+      <h2>Arrastra tu archivo aquí</h2>
+      <p>o haz clic para buscar en tu equipo</p>
+      <span className="dz-hint">Máx. 25 GB · Cualquier formato</span>
     </div>
   );
 }

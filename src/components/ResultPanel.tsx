@@ -33,21 +33,21 @@ export function ResultPanel({ phase, file, url, onReset }: Props) {
       </div>
 
       <div className="result-title">
-        {isSuccess ? 'Upload complete!' : 'Upload cancelled'}
+        {isSuccess ? '¡Subida completa!' : 'Subida cancelada'}
       </div>
       <div className="result-sub">
         {isSuccess
-          ? `${file?.name ?? 'File'} is now available in the cloud`
-          : 'The upload was cancelled and cleaned up'}
+          ? `${file?.name ?? 'El archivo'} ya está disponible en la nube`
+          : 'La subida fue cancelada y los datos eliminados'}
       </div>
 
       {isSuccess && url && (
         <div className="url-box">
-          <span className="url-label">Public URL</span>
+          <span className="url-label">URL pública</span>
           <div className="url-row">
             <span className="url-text">{url}</span>
             <button className="btn btn-sm btn-ghost" onClick={copyLink}>
-              {copied ? '✓ Copied' : 'Copy'}
+              {copied ? '✓ Copiado' : 'Copiar'}
             </button>
           </div>
         </div>
@@ -56,11 +56,11 @@ export function ResultPanel({ phase, file, url, onReset }: Props) {
       <div className="result-actions">
         {isSuccess && url && (
           <a className="btn btn-primary" href={url} target="_blank" rel="noreferrer">
-            Open file ↗
+            Abrir archivo ↗
           </a>
         )}
         <button className="btn btn-ghost" onClick={onReset}>
-          Upload another
+          Subir otro archivo
         </button>
       </div>
     </div>

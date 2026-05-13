@@ -65,9 +65,9 @@ export function PreviewPanel({ file, onConfirm, onCancel }: Props) {
 
       {/* Actions */}
       <div className="preview-actions">
-        <button className="btn btn-ghost" onClick={onCancel}>Cancel</button>
+        <button className="btn btn-ghost" onClick={onCancel}>Cancelar</button>
         <button className="btn btn-primary" onClick={onConfirm}>
-          Upload to cloud ↑
+          Subir a la nube ↑
         </button>
       </div>
     </div>

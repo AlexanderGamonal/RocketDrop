@@ -33,7 +33,7 @@ export function UploadPanel({ file, progress, error, onCancel, onReset }: Props)
       <div className="upload-pct-row">
         <div className="upload-status">
           {!isError && <span className="dot" />}
-          <span>{isError ? 'Upload failed' : 'Uploading…'}</span>
+          <span>{isError ? 'Error al subir' : 'Subiendo…'}</span>
         </div>
         <span className="upload-pct">{Math.round(pct)}%</span>
       </div>
@@ -47,18 +47,18 @@ export function UploadPanel({ file, progress, error, onCancel, onReset }: Props)
           <strong>{speed > 0 ? `${fmtBytes(speed)}/s` : '—'}</strong>
         </span>
         <span className="stat-pill">
-          {eta !== null ? <><strong>{fmtTime(eta)}</strong> left</> : 'Calculating…'}
+          {eta !== null ? <><strong>{fmtTime(eta)}</strong> restantes</> : 'Calculando…'}
         </span>
         <span className="stat-pill">
-          Parts <strong>{completedParts}/{totalParts}</strong>
+          Partes <strong>{completedParts}/{totalParts}</strong>
         </span>
       </div>
 
       <div className="upload-actions">
         {isError ? (
-          <button className="btn btn-outline" onClick={onReset}>↩ Start over</button>
+          <button className="btn btn-outline" onClick={onReset}>↩ Volver a intentar</button>
         ) : (
-          <button className="btn btn-danger" onClick={onCancel}>✕ Cancel</button>
+          <button className="btn btn-danger" onClick={onCancel}>✕ Cancelar</button>
         )}
       </div>
     </div>
