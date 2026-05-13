@@ -41,6 +41,7 @@ app.post('/api/upload/init', async (req, res) => {
       Bucket: BUCKET,
       Key: key,
       ContentType: contentType || 'application/octet-stream',
+      CacheControl: 'public, max-age=31536000, immutable',
     });
     const { UploadId } = await s3.send(cmd);
     res.json({ uploadId: UploadId, key });
@@ -70,6 +71,33 @@ app.post('/api/upload/part-url', async (req, res) => {
     res.json({ url });
   } catch (err) {
     console.error('[part-url]', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/upload/part-urls
+// Body: { key, uploadId, totalParts }
+// Returns: { urls: string[] }  — all presigned URLs in one round-trip
+app.post('/api/upload/part-urls', async (req, res) => {
+  const { key, uploadId, totalParts } = req.body;
+  if (!key || !uploadId || !totalParts || totalParts < 1) {
+    return res.status(400).json({ error: 'key, uploadId, totalParts required' });
+  }
+
+  try {
+    const urls = await Promise.all(
+      Array.from({ length: totalParts }, (_, i) =>
+        getSignedUrl(s3, new UploadPartCommand({
+          Bucket: BUCKET,
+          Key: key,
+          UploadId: uploadId,
+          PartNumber: i + 1,
+        }), { expiresIn: 3600 })
+      )
+    );
+    res.json({ urls });
+  } catch (err) {
+    console.error('[part-urls]', err.message);
     res.status(500).json({ error: err.message });
   }
 });

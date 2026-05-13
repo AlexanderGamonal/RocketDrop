@@ -17,6 +17,9 @@ export const initUpload = (filename: string, contentType: string) =>
 export const getPartUrl = (key: string, uploadId: string, partNumber: number) =>
   call<{ url: string }>('POST', '/api/upload/part-url', { key, uploadId, partNumber });
 
+export const getAllPartUrls = (key: string, uploadId: string, totalParts: number) =>
+  call<{ urls: string[] }>('POST', '/api/upload/part-urls', { key, uploadId, totalParts });
+
 export const completeUpload = (key: string, uploadId: string, parts: Part[]) =>
   call<{ url: string }>('POST', '/api/upload/complete', { key, uploadId, parts });
 
